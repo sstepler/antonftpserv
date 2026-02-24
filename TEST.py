@@ -38,14 +38,16 @@ for item in data:
             if key.lower() == "retail":
                 # получаем бренд из текущего товара
                 brand = item.get("brand", "")
+                category = item.get("category", "")
             
                 # Списки исключений 
-                excluded_brands = ["Mazzini", "Nexen", "MAXXIS"]
+                excluded_brands = ["Mazzini", "Nexen", "MAXXIS", "Predator", "Compasal",]
+                excluded_category = ["Грузовая"]
             
-                if brand not in excluded_brands:
+                if brand not in excluded_brands and category not in excluded_category:
                     try:
                         val = float(str(value).replace(",", ".").strip())
-                        val = int(val * 0.88)   # корректировка цены
+                        val = int(val * 0.89)   # корректировка цены
                         element.text = str(val)
                     except ValueError:
                         element.text = str(value)
@@ -73,4 +75,4 @@ tree = ET.ElementTree(root)
 with open("testtyres.xml", "wb") as file:
     tree.write(file, encoding="utf-8", xml_declaration=True)
 
-print("✅ XML файл успешно создан; розничные цены <retail> уменьшены на 5%.")
+print("✅ XML файл успешно создан; розничные цены <retail> с корректировкой цен.")
