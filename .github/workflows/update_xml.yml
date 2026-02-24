@@ -2,7 +2,7 @@ name: Update Products XML
 
 on:
   schedule:
-    - cron: "17 18 * * *" # Запуск каждый день в 19:00 по новосибирскому времени (UTC+7)
+    - cron: "00 12 * * *" # Запуск каждый день в 19:00 по новосибирскому времени (UTC+7)
   workflow_dispatch: # Позволяет запускать workflow вручную
 
 jobs:
@@ -31,7 +31,7 @@ jobs:
         id: changes
         if: always()
         run: |
-          git add zaptyres.xml
+          git add azaptyres.xml
           if git diff-index --quiet HEAD; then
             echo "::set-output name=has_changes::false"
           else
