@@ -42,7 +42,7 @@ for item in data:
                 # Списки исключений 
                 excluded_brands = ["Mazzini", "Nexen", "MAXXIS"]
             
-                if model not in excluded_models and brand not in excluded_brands:
+                if brand not in excluded_brands:
                     try:
                         val = float(str(value).replace(",", ".").strip())
                         val = int(val * 0.88)   # корректировка цены
