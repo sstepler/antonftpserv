@@ -3,9 +3,7 @@ import xml.etree.ElementTree as ET
 import re
 import os
 
-api_url = os.getenv('FORTOCHKI_T')
-if not api_url:
-    raise ValueError("Не установлена переменная окружения FORTOCHKI_T с URL API")    
+api_url = "https://b2b.4tochki.ru/export_data/M35352.xml?r=20260224141628" 
 
 # Заголовки для запроса (если необходимо)
 headers = {
