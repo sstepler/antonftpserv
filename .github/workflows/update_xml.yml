@@ -27,11 +27,9 @@ jobs:
         run: python zapaska_tyres.py
         continue-on-error: true 
 
-      - name: Run 4tocki_tyres.py
-        run: python zapaska_tyres (TEST).py
+      - name: Run test
+        run: python TEST.py
         continue-on-error: true
-        env:
-           FORTOCHKI_T: ${{ secrets.FORTOCHKI_A }}
 
       - name: Check for changes
         id: changes
