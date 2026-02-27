@@ -121,7 +121,7 @@ def filter_and_save_items(api_url, output_file, filter_tag=None, existing_items=
     return new_root
 
 def main():
-    url1 = "https://b2b.4tochki.ru/export_data/M35352.xml
+    url1 = "https://b2b.4tochki.ru/export_data/M35352.xml"
 
     # Создаем пустые файлы-шаблоны
     ET.ElementTree(ET.Element("items")).write("tyres.xml", encoding="utf-8", xml_declaration=True)
