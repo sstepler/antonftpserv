@@ -69,7 +69,7 @@ def adjust_retail_prices_plus5(root: ET.Element) -> None:
             if source_val is None:
                 continue  # нечего повышать
 
-            new_val = int(source_val * 1.05)  # округление до целого вниз
+            new_val = int(source_val * 0.95)  # округление до целого вниз
             elem.text = str(new_val)
 
 def filter_and_save_items(api_url, output_file, filter_tag=None, existing_items=None,
@@ -121,8 +121,7 @@ def filter_and_save_items(api_url, output_file, filter_tag=None, existing_items=
     return new_root
 
 def main():
-    url1 = "https://b2b.4tochki.ru/export_data/M28274.xml"
-    url2 = "https://abcdisk54.ru/ftp/Brinex_shina.xml"
+    url1 = "https://b2b.4tochki.ru/export_data/M35352.xml
 
     # Создаем пустые файлы-шаблоны
     ET.ElementTree(ET.Element("items")).write("tyres.xml", encoding="utf-8", xml_declaration=True)
@@ -149,15 +148,6 @@ def main():
         url1, "tyres_gruz.xml",
         filter_tag=None,
         include_tag="tiretype", include_value="Грузовая",
-        status="Под заказ"
-    )
-
-    # Вторая выгрузка (Brinex)
-    filter_and_save_items(
-        url2, "tyres.xml",
-        filter_tag=None,
-        existing_items=existing_items,
-        include_tag=None, include_value=None,
         status="Под заказ"
     )
 
