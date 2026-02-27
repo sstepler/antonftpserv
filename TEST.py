@@ -41,7 +41,7 @@ for item in data:
                 category = item.get("category", "")
             
                 # Списки исключений 
-                excluded_brands = ["Mazzini", "Nexen", "MAXXIS", "Predator", "Compasal",]
+                excluded_brands = ["Mazzini", "Nexen", "MAXXIS", "Predator", "Compasal","Massimo","Firemax","Sonix","Prinx","Roadmarch"]
                 excluded_category = ["Грузовая"]
             
                 if brand not in excluded_brands and category not in excluded_category:
