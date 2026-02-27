@@ -156,7 +156,7 @@ def main():
 
     # Легковые (без rest_novosib3) -> tyres.xml
     filter_and_save_items(
-        url1, "tyres.xml",
+        url1, "4tyres.xml",
         filter_tag=None,
         include_tag="tiretype", include_value="Легковая",
         status="Под заказ",
@@ -165,7 +165,7 @@ def main():
 
     # Легковые (с rest_novosib3) -> tyres_nsk.xml
     filter_and_save_items(
-        url1, "tyres_nsk.xml",
+        url1, "4test_nsk.xml",
         filter_tag="rest_novosib3",
         include_tag="tiretype", include_value="Легковая",
         status="В наличии",
