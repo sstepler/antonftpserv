@@ -32,7 +32,7 @@ jobs:
         continue-on-error: true
 
       - name: Run test
-        run: python pwrtyres.py
+        run: python 4tyres.py
         continue-on-error: true
 
       - name: Check for changes
