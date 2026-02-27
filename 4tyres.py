@@ -42,21 +42,28 @@ def _to_number(text: Optional[str]) -> Optional[float]:
     except ValueError:
         return None
 
-def adjust_retail_prices_plus5(root: ET.Element) -> None:
-    """Значения всех тегов *_rozn на % от ИХ ЖЕ текущего значения.
+def adjust_retail_prices_plus5(root: ET.Element, exclude_brands: set = None) -> None:
+    """
+    Увеличивает значения всех тегов *_rozn на 5% от ИХ ЖЕ текущего значения.
     Если *_rozn пустой/нечисловой — пробуем взять значение из парного базового тега без суффикса.
     Результат округляется вниз до целого (int()).
+    Параметр exclude_brands: множество брендов, для которых скидка НЕ применяется.
     """
+    if exclude_brands is None:
+        exclude_brands = set()
+
     for item in root.findall(".//item"):
+        # Проверяем бренд товара
+        brand_elem = item.find("brand")
+        if brand_elem is not None and brand_elem.text in exclude_brands:
+            continue  # исключаем этот товар из обработки
+
         tag_map = {child.tag: child for child in list(item)}
         for tag, elem in tag_map.items():
             if not tag.endswith("_rozn"):
                 continue
 
-            # 1) Пытаемся взять текущее retail-значение
             rozn_val = _to_number(elem.text)
-
-            # 2) Если retail нечисловой — берём базовый тег (без "_rozn")
             base_val = None
             if rozn_val is None:
                 base_tag = tag[:-5]
@@ -66,15 +73,15 @@ def adjust_retail_prices_plus5(root: ET.Element) -> None:
 
             source_val = rozn_val if rozn_val is not None else base_val
             if source_val is None:
-                continue  # нечего повышать
+                continue
 
-            new_val = int(source_val * 0.95)  # округление до целого вниз
+            new_val = int(source_val * 0.95)
             elem.text = str(new_val)
 
-def filter_and_save_items(api_url, output_file, filter_tag=None, existing_items=None,
-                          include_tag=None, include_value=None, status=None):
+def filter_and_save_items(api_url, output_file, filter_tag=None, existing_items=None, 
+                          include_tag=None, include_value=None, status=None, exclude_brands: set = None):
     """Фильтрует товары, удаляет дубликаты, приводит поля к общему формату и сохраняет в XML-файл.
-       После записи увеличивает все *_rozn на "%" от основной суммы."""
+       После записи увеличивает все *_rozn на "%" от основной суммы exclude_brands: множество брендов, для которых не применять скидку 5%."""
     root = fetch_xml(api_url)
     new_root = existing_items if existing_items is not None else ET.Element("items")
 
@@ -112,8 +119,8 @@ def filter_and_save_items(api_url, output_file, filter_tag=None, existing_items=
                     thorn_elem = ET.SubElement(new_item, 'thorn')
                 thorn_elem.text = 'Липучка'
     
-    # Увеличиваем все *_rozn на 5% для этого файла
-    adjust_retail_prices_plus5(new_root)
+     # Увеличиваем все *_rozn на 5% для этого файла, исключая указанные бренды
+    adjust_retail_prices_plus5(new_root, exclude_brands)
 
     tree = ET.ElementTree(new_root)
     tree.write(output_file, encoding="utf-8", xml_declaration=True)
