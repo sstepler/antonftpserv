@@ -152,11 +152,13 @@ def main():
     url1 = "https://b2b.4tochki.ru/export_data/M35352.xml?r=20260227183959"
 
     # Задаём бренды, которые не должны получать скидку 5%
-    brands_to_exclude = {"Tracmax", "Sailun", "Landspider", "HiFly", "Antares", "Fortune", "Goodride", "LingLong Leao", "Sailun RoadX", "Triangle"}  # замените на реальные названия
+    brands_to_exclude = {"Tracmax", "Sailun", "Landspider", "HiFly", 
+                         "Antares", "Fortune", "Goodride", "LingLong Leao", 
+                         "Sailun RoadX", "Triangle"} # замените на реальные названия
 
     # Легковые (без rest_novosib3) -> tyres.xml
     filter_and_save_items(
-        url1, "4tyres.xml",
+        url1, "4test.xml",
         filter_tag=None,
         include_tag="tiretype", include_value="Легковая",
         status="Под заказ",
@@ -169,6 +171,15 @@ def main():
         filter_tag="rest_novosib3",
         include_tag="tiretype", include_value="Легковая",
         status="В наличии",
+        exclude_brands=brands_to_exclude
+    )
+
+    # Грузовые -> tyres_gruz.xml
+    filter_and_save_items(
+        url1, "4test_gruz.xml",
+        filter_tag=None,
+        include_tag="tiretype", include_value="Грузовая",
+        status="Под заказ",
         exclude_brands=brands_to_exclude
     )
 
