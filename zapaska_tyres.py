@@ -34,20 +34,31 @@ for item in data:
         if key != "Оптовая_Цена":  # Исключаем поле "Оптовая_Цена"
             element = ET.SubElement(product, key)
 
-           # --- увеличение розничной цены на 5% (с исключениями) ---
+        # --- увеличение розничной цены на 5% (с исключениями) ---
             if key.lower() == "retail":
-                # получаем бренд из текущего товара
                 brand = item.get("brand", "")
                 category = item.get("category", "")
             
                 # Списки исключений 
-                excluded_brands = ["Mazzini", "Nexen", "MAXXIS", "Predator", "Compasal","Massimo","Firemax","Sonix","Prinx","Roadmarch"]
+                excluded_brands = ["Mazzini", "Nexen", "MAXXIS", "Predator", "Compasal","Massimo",
+                                   "Firemax","Sonix","Prinx","Roadmarch", "Notto", "Rapid", "Matador", 
+                                   "Kelly", "HIFLY", "Fluda", "Firemax", "Cordian", "Aoteli", "Torero",
+                                  "Viatti", "Кама",]
                 excluded_category = ["Грузовая"]
+            
+                # Словарь специальных коэффициентов для отдельных брендов
+                special_coeffs = {
+                    "Ikon (Nokian Tyres)": 0.88,       # -12%
+                    "Yokohama": 0.95,                  # -5%
+                    "Pirelli": 0.97,                   # -4%
+                }
             
                 if brand not in excluded_brands and category not in excluded_category:
                     try:
                         val = float(str(value).replace(",", ".").strip())
-                        val = int(val * 0.89)   # корректировка цены
+                        # Если бренд есть в special_coeffs — берём его коэффициент, иначе общий 0.92
+                        coeff = special_coeffs.get(brand.lower(), 0.935)
+                        val = int(val * coeff)
                         element.text = str(val)
                     except ValueError:
                         element.text = str(value)
@@ -55,8 +66,7 @@ for item in data:
                     element.text = str(value)
             else:
                 element.text = str(value)
-            # ----------------------------------------
-
+        # ----------------------------------------
     # Добавляем поле studded для модели Nortec LT 610
     model = item.get("model", "")
     if model == "Nortec LT 610":
