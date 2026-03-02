@@ -48,9 +48,9 @@ for item in data:
             
                 # Словарь специальных коэффициентов для отдельных брендов
                 special_coeffs = {
-                    "Ikon (Nokian Tyres)": 0.82,       # -18%
-                    "Yokohama": 0.95,                  # -5%
-                    "Pirelli": 0.97,                   # -4%
+                    "ikon (nokian tyres)": 0.888,       # -12.2%
+                    "yokohama": 0.95,                  # -5%
+                    "pirelli": 0.97,                   # -4%
                 }
             
                 if brand not in excluded_brands and category not in excluded_category:
