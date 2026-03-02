@@ -29,6 +29,10 @@ for item in data:
     if name.startswith("ЗБ"):
         continue  # Пропускаем этот товар
 
+    # --- Нормализация бренда: замена "Ikon (Nokian Tyres)" на "Ikon" ---
+    if item.get("brand") == "Ikon (Nokian Tyres)":
+            item["brand"] = "Ikon"
+       
     product = ET.SubElement(root, "Product")
     for key, value in item.items():
         if key != "Оптовая_Цена":  # Исключаем поле "Оптовая_Цена"
@@ -57,10 +61,10 @@ for item in data:
             # Словарь специальных правил для конкретных моделей
             # Ключ — кортеж (бренд, модель) в нижнем регистре
             special_model_rules = {
-                ("ikon (nokian tyres)", "autograph ice 9 suv"): {
+                ("ikon", "autograph ice 9 suv"): {
                     "type": "add_to_field",
                     "field": "price",      # из какого поля берём базу
-                    "value": 1200          # сколько добавляем
+                    "value": 1500          # сколько добавляем
                 },
                 # Пример фиксированной цены:
                 # ("nokian", "hakkapeliitta 10"): {
