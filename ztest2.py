@@ -11,8 +11,8 @@ API_USER = "API_client"
 API_PASSWORD = "rWp7mFWXRKOq"
 
 # Параметры округления цен (применяются, если не переопределены ниже)
-ROUND_STEP = 100        # шаг округления (рубли)
-ROUND_METHOD = 'up'     # метод: 'up' (вверх), 'down' (вниз), 'nearest' (к ближайшему)
+ROUND_STEP = 10        # шаг округления (рубли)
+ROUND_METHOD = 'nearest'     # метод: 'up' (вверх), 'down' (вниз), 'nearest' (к ближайшему)
 
 # Список брендов, которые НЕ корректируем (цены оставляем как есть, но округляем)
 EXCLUDED_BRANDS = [
@@ -51,7 +51,18 @@ BRAND_COEFFS = {
         "diameter_ranges": [
             {"min": 13, "max": 15, "coeff": 0.90},
             {"min": 17, "max": 22, "coeff": 0.88},
-        ],
+            ],
+    },
+    "laufenn": 0.905,
+    "bridgestone": 0.965,
+    "hankook": {
+        "default": 0.915,
+        "diameter_ranges": [
+            {"min": 13, "max": 16, "coeff": 0.907},
+            {"min": 17, "max": 22, "coeff": 0.906},
+            ],
+    },
+    
         # "round_step": 50,
         # "round_method": "nearest"
     #"michelin": 0.90,  # простой коэффициент
