@@ -121,7 +121,7 @@ for item in data:
 
 # Создание дерева XML и запись в файл
 tree = ET.ElementTree(root)
-with open("testtyres.xml", "wb") as file:
+with open("ztest.xml", "wb") as file:
     tree.write(file, encoding="utf-8", xml_declaration=True)
 
 print("✅ XML файл успешно создан; розничные цены <retail> с корректировкой цен.")
