@@ -24,7 +24,7 @@ jobs:
           pip install requests
 
       - name: Run update tyres
-        run: python zapaska_tyres.py
+        run: python ztest.py
         continue-on-error: true 
 
       - name: Run test
