@@ -34,14 +34,12 @@ BRAND_COEFFS = {
 # Специальные правила для конкретных моделей (приоритет выше, чем брендовые коэффициенты)
 # Ключ — кортеж (бренд, модель) в нижнем регистре
 MODEL_RULES = {
-    ("ikon", "autograph ice 9 suv"): {
+    ("autograph", "autograph ice 9 suv"): {
         "type": "add_to_field_by_diameter",    # тип правила
         "field": "price",                        # из какого поля брать базу
         "ranges": [                               # диапазоны диаметров
-            {"min": 16, "max": 17, "value": 1200},
-            {"min": 18, "max": 19, "value": 1400},
-            {"min": 18, "max": 19, "value": 1900},
-            {"min": 18, "max": 19, "value": 2300},
+            {"min": 16, "max": 17, "value": 1300},
+            {"min": 18, "max": 19, "value": 1700},
             # добавьте другие диапазоны
         ],
         "default": None,                          # значение, если диаметр вне диапазонов (None = не менять)
@@ -63,7 +61,16 @@ MODEL_RULES = {
     # },
 }
 
-# ===================== ФУНКЦИЯ ОКРУГЛЕНИЯ =====================
+# ===================== ФУНКЦИИ =====================
+def safe_float(val, default=0.0):
+    """Безопасное преобразование в float. Возвращает default, если не удалось."""
+    if val is None:
+        return default
+    try:
+        return float(str(val).replace(",", ".").strip())
+    except ValueError:
+        return default
+
 def round_price(price, step=None, method=None):
     """Округляет цену price до числа, кратного step.
        Если step или method не указаны, используются глобальные значения.
@@ -117,16 +124,9 @@ for item in data:
             category = item.get("category", "")
 
             # ---- Извлечение диаметра (для правил, зависящих от диаметра) ----
-            diameter = None
-            # Пробуем получить из поля "diameter", если есть
-            diam_str = item.get("diameter", "")
-            if diam_str:
-                try:
-                    diameter = float(str(diam_str).replace(",", ".").strip())
-                except:
-                    pass
-            # Если не получилось, извлекаем из "Номенклатура" (например, "R16")
+            diameter = safe_float(item.get("diameter"), default=None)
             if diameter is None:
+                # Пробуем извлечь из "Номенклатура" (например, "R16")
                 nomenclature = item.get("Номенклатура", "")
                 match = re.search(r'[Rr](\d{2})', nomenclature)
                 if match:
@@ -137,23 +137,22 @@ for item in data:
                            category in EXCLUDED_CATEGORY)
 
             # ---- Итоговая цена (сначала вычисляем, потом округлим) ----
-            final_price = None  # будем использовать для округления
+            final_price = None
 
             try:
                 # Если товар в исключениях — берём исходное retail без изменений
                 if is_excluded:
-                    final_price = float(str(value).replace(",", ".").strip())
+                    final_price = safe_float(value)
                 else:
                     # Проверяем, есть ли правило для конкретной модели
                     rule = MODEL_RULES.get((brand, model))
                     if rule:
                         rule_type = rule["type"]
                         if rule_type == "fixed":
-                            final_price = float(rule["value"])
+                            final_price = safe_float(rule["value"])
                         elif rule_type == "add_to_field":
                             base_field = rule["field"]
-                            base_val_str = item.get(base_field, "0")
-                            base_val = float(str(base_val_str).replace(",", ".").strip())
+                            base_val = safe_float(item.get(base_field, "0"))
                             final_price = base_val + rule["value"]
                         elif rule_type == "add_to_field_by_diameter":
                             if diameter is not None:
@@ -164,37 +163,35 @@ for item in data:
                                         break
                                 if add_value is not None:
                                     base_field = rule["field"]
-                                    base_val_str = item.get(base_field, "0")
-                                    base_val = float(str(base_val_str).replace(",", ".").strip())
+                                    base_val = safe_float(item.get(base_field, "0"))
                                     final_price = base_val + add_value
                                 else:
                                     # Если диаметр вне диапазонов, используем default (если есть)
                                     if rule.get("default") is not None:
                                         base_field = rule["field"]
-                                        base_val_str = item.get(base_field, "0")
-                                        base_val = float(str(base_val_str).replace(",", ".").strip())
+                                        base_val = safe_float(item.get(base_field, "0"))
                                         final_price = base_val + rule["default"]
                                     else:
                                         # Оставляем исходное retail
-                                        final_price = float(str(value).replace(",", ".").strip())
+                                        final_price = safe_float(value)
                             else:
                                 # Диаметр не определён — оставляем исходное
-                                final_price = float(str(value).replace(",", ".").strip())
+                                final_price = safe_float(value)
                         else:
                             # Неизвестный тип правила — оставляем исходное
-                            final_price = float(str(value).replace(",", ".").strip())
+                            final_price = safe_float(value)
                     else:
                         # Нет правила для модели — применяем брендовый коэффициент
-                        coeff_info = BRAND_COEFFS.get(brand, {"coeff": 0.95})
+                        coeff_info = BRAND_COEFFS.get(brand, {"coeff": 0.92})
                         coeff = coeff_info["coeff"]
-                        orig_val = float(str(value).replace(",", ".").strip())
+                        orig_val = safe_float(value)
                         final_price = orig_val * coeff
             except Exception as e:
                 # Если что-то пошло не так, оставляем исходное значение
-                final_price = float(str(value).replace(",", ".").strip())
+                final_price = safe_float(value)
 
             # ---- ОКРУГЛЕНИЕ (применяется ко всем товарам) ----
-            # Определяем параметры округления: сначала ищем в правиле модели, потом в брендовых настройках, потом глобальные
+            # Определяем параметры округления
             step = ROUND_STEP
             method = ROUND_METHOD
 
@@ -215,7 +212,8 @@ for item in data:
                 rounded = round_price(final_price, step, method)
                 element.text = str(int(rounded))
             except:
-                element.text = str(int(final_price))  # если округление не удалось, просто целая часть
+                # Если округление не удалось, пишем хотя бы целую часть от final_price
+                element.text = str(int(final_price))
 
         else:
             # Для всех остальных полей — просто копируем значение
