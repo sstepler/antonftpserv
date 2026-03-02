@@ -142,6 +142,11 @@ for item in data:
     if item.get("brand") == "Ikon (Nokian Tyres)":
         item["brand"] = "Ikon"
 
+    # Удаление "(Nokian Tyres)" из названия
+    if "name" in item and "(Nokian Tyres)" in item["name"]:
+        item["name"] = item["name"].replace("(Nokian Tyres)", "").strip()
+        item["name"] = re.sub(r'\s+', ' ', item["name"])
+
     product = ET.SubElement(root, "Product")
 
     for key, value in item.items():
