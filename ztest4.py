@@ -351,7 +351,7 @@ for key, xml_root in extra_roots.items():
 # Вывод статистики
 print(f"✅ XML файлы успешно созданы.")
 print(f"   - Пропущено (ЗБ): {excluded_zb}")
-print(f"   - Исключено по названию: {excluded_name}")
+print(f"   - Исключено по артикулу: {excluded_article}")
 print(f"   - Всего обработано (в XML): {total_products}")
 print(f"\n📊 Статистика по диаметрам:")
 if diameter_count:
