@@ -25,6 +25,13 @@ EXCLUDED_BRANDS = [
 # Категории, которые НЕ корректируем
 EXCLUDED_CATEGORY = ["Грузовая"]
 
+# ===================== ИСКЛЮЧЕНИЯ ПО НАЗВАНИЯМ =====================
+EXCLUDED_NAMES = [
+    "195/75R16C Laufenn X FIT VAN LV01 107/105R Н/А",
+    "АТ27x8-12 MAXXIS M961 6PR",   # пример другого названия
+    # добавьте другие полные названия
+]
+
 # ===================== ГЛОБАЛЬНЫЙ КОЭФФИЦИЕНТ =====================
 # Применяется ко всем шинам, если нет специального правила для модели или бренда.
 GLOBAL_COEFF = {
@@ -134,10 +141,15 @@ data = response.json()
 
 # ===================== СОЗДАНИЕ XML =====================
 root = ET.Element("Products")
+excluded_zb = 0
+excluded_diameter = 0
+excluded_name = 0
+total_processed = 0
 
 for item in data:
     name = item.get("name", "")
     if name.startswith("ЗБ"):
+        excluded_zb += 1
         continue
 
     # Нормализация бренда
@@ -148,6 +160,19 @@ for item in data:
     if "name" in item and "(Nokian Tyres)" in item["name"]:
         item["name"] = item["name"].replace("(Nokian Tyres)", "").strip()
         item["name"] = re.sub(r'\s+', ' ', item["name"])
+
+    model_replacements = {
+        "Blu Earth V906": ("BluEarth Winter V906", "BluEarth Winter V906"),
+        "VS-EV": ("Victra Sport EV", "Victra Sport EV"),
+    }
+    current_model = item.get("model", "")
+    if current_model in model_replacements:
+        new_model, new_name_part = model_replacements[current_model]
+        item["model"] = new_model
+        if "name" in item:
+            old_name = item["name"]
+            new_name = old_name.replace(current_model, new_name_part)
+            item["name"] = new_name
 
     product = ET.SubElement(root, "Product")
 
@@ -173,7 +198,14 @@ for item in data:
                 if match:
                     diameter = float(match.group(1))
             if diameter is not None and 12 <= diameter <= 15:
+                excluded_diameter += 1
                 continue  # пропускаем этот товар
+
+            if name in EXCLUDED_NAMES:
+                excluded_name += 1
+                continue
+
+            total_products += 1
 
             # ---- Проверка на исключения ----
             is_excluded = (brand in [b.lower() for b in EXCLUDED_BRANDS] or
@@ -265,4 +297,8 @@ tree = ET.ElementTree(root)
 with open("aztyre.xml", "wb") as file:
     tree.write(file, encoding="utf-8", xml_declaration=True)
 
-print("✅ XML файл успешно создан; применены глобальные и брендовые коэффициенты с учётом диаметра.")
+print(f"✅ XML файл успешно создан; применены глобальные и брендовые коэффициенты с учётом диаметра.")
+print(f"   - Пропущено (ЗБ): {excluded_zb}")
+print(f"   - Исключено по диаметру 12-15: {excluded_diameter}")
+print(f"   - Исключено по названию: {excluded_name}")
+print(f"   - Всего обработано (в XML): {total_processed}")
