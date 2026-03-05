@@ -192,7 +192,7 @@ for item in data:
         continue
 
     # ---- Исключение по списку названий ----
-   if any(phrase in name for phrase in EXCLUDED_PHRASES):
+    if any(phrase in name for phrase in EXCLUDED_PHRASES):
         excluded_name += 1
         continue
 
