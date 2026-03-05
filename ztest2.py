@@ -141,6 +141,7 @@ data = response.json()
 
 # ===================== СОЗДАНИЕ XML =====================
 root = ET.Element("Products")
+total_products = 0
 excluded_zb = 0
 excluded_diameter = 0
 excluded_name = 0
