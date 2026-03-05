@@ -31,6 +31,10 @@ EXCLUDED_ARTICLES = [
     "T743460",
     "Х0000029644",
 ]
+# ===================== ИСКЛЮЧЕНИЯ ПО CAE =====================
+EXCLUDED_CAE = [
+    "00000006983",
+]
 # ===================== ГЛОБАЛЬНЫЙ КОЭФФИЦИЕНТ =====================
 # Применяется ко всем шинам, если нет специального правила для модели или бренда.
 GLOBAL_COEFF = {
@@ -253,6 +257,7 @@ total_products = 0
 excluded_zb = 0
 excluded_diameter = 0  # больше не используется, но оставим для совместимости
 excluded_article = 0
+excluded_cae = 0
 diameter_count = {}
 
 for item in data:
@@ -297,6 +302,11 @@ for item in data:
     article = item.get("article", "")
     if any(phrase in article for phrase in EXCLUDED_ARTICLES):
         excluded_article += 1
+        continue
+
+    cae = item.get("cae", "")
+    if any(phrase in article for phrase in EXCLUDED_CAE):
+        excluded_cae += 1
         continue
 
     # Товар прошёл все фильтры
@@ -352,6 +362,7 @@ print(f"✅ XML файлы успешно созданы.")
 print(f"   - Пропущено (ЗБ): {excluded_zb}")
 print(f"   - Исключено по артикулу: {excluded_article}")
 print(f"   - Всего обработано (в XML): {total_products}")
+print(f"   - Всего обработано (в XML): {total_cae}")
 print(f"\n📊 Статистика по диаметрам:")
 if diameter_count:
     for d in sorted([k for k in diameter_count if k != 'unknown']):
