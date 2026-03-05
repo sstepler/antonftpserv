@@ -44,7 +44,7 @@ jobs:
 
       - name: Run update tyres
         if: github.event_name != 'push'
-        run: python ztest2.py
+        run: python ztest3.py
         continue-on-error: true
 
       - name: Run test
